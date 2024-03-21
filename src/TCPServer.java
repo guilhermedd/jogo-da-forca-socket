@@ -3,14 +3,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
+
 public class TCPServer {
     public static void main(String[] args) throws IOException {
 
         Properties properties = new Properties();
-        FileInputStream file = new FileInputStream("network.peroperties");
+        FileInputStream file = new FileInputStream("network.properties");
         properties.load(file);
 
-        int serverPort = Integer.getInteger((String) properties.get("SERVER_PORT"));
+        int serverPort = Integer.getInteger(properties.getProperty("SERVER_PORT"));
         ServerSocket serverSocket = null;
         Socket client = null;
 

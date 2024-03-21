@@ -5,50 +5,57 @@ import java.util.Scanner;
 
 public class TCPCliente {
     public static void main(String[] args) throws IOException {
+        int serverPort = 0;
+        String serverAddress = null;
+        try {
+            Properties properties = new Properties();
+            FileInputStream file = new FileInputStream("network.peroperties");
+            properties.load(file);
 
-        Properties properties = new Properties();
-        FileInputStream file = new FileInputStream("network.peroperties");
-        properties.load(file);
+
+
+            System.out.println(properties.getProperty("SERVER_PORT"));
+
+            serverPort = Integer.getInteger(properties.getProperty("SERVER_PORT"));
+            serverAddress = properties.getProperty("SERVER_ADDRESS");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         Scanner scanner = new Scanner(System.in);
-
-
-        int serverPort = Integer.getInteger(properties.getProperty("SERVER_PORT"));
-        String serverAddress = properties.getProperty("SERVER_ADDRESS");
-
         Socket server = null;
 
         try {
             server = new Socket(serverAddress, serverPort);
 
-            // Talto to server
+            // Talk to server
             BufferedReader reader = new BufferedReader(new InputStreamReader(server.getInputStream()));
             PrintWriter out = new PrintWriter(server.getOutputStream());
 
-            String response;
+            String response = null;
 
 
-            while ((response = reader.readLine())!= null) {
+            while (true) {
+                while(response == null) {
+                    response = reader.readLine();
+                }
                 System.out.println(response);
-                String word;
+                Character letter;
 
                 if (response.startsWith("You guessesd")) {
+                    System.out.println(response);
                     server.close();
                     break;
                 }
 
                 while (response.startsWith("You already guessed that letter!")) {
-                    System.out.println("Type the letter: ");
-                    word = scanner.nextLine();
+                    letter = scanner.nextLine().charAt(0);
+                    out.println(letter);
+                    response = reader.readLine();
                 }
 
-                word = scanner.nextLine();
-                while (word.length() != 1) {
-                    System.out.println("You must type 1 letter: ");
-                    word = scanner.nextLine();
-                }
-
-                out.println(word);
+                letter = scanner.nextLine().charAt(0);
+                out.println(letter);
             }
 
         } catch (IOException e) {
